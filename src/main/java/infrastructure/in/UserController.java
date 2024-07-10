@@ -1,16 +1,19 @@
 package infrastructure.in;
 
 import application.CreateUserUseCase;
+import application.FindUserUseCase;
 import domain.entity.User;
 import utils.ConsoleUtils;
+import utils.MyScanner;
 
-import java.util.Scanner;
+
 
 public class UserController {
-    private  CreateUserUseCase createUserUseCase;
-
-    public UserController(CreateUserUseCase createUserUseCase) {
+    private CreateUserUseCase createUserUseCase;
+    private FindUserUseCase findUserUseCase;
+    public UserController(CreateUserUseCase createUserUseCase,FindUserUseCase findUserUseCase) {
         this.createUserUseCase = createUserUseCase;
+        this.findUserUseCase = findUserUseCase;
     }
 
     public void start() {
@@ -22,12 +25,12 @@ public class UserController {
             switch (option) {
                 case 1:
                 // create player
-                    try (Scanner scanner = new Scanner(System.in)) {
+                    try {
                         System.out.println("Enter user name: ");
-                        String name = scanner.nextLine();
+                        String name = MyScanner.scanLine();
             
                         System.out.println("Enter user email: ");
-                        String email = scanner.nextLine();
+                        String email = MyScanner.scanLine();
             
                         User user = new User();
                         user.setName(name);
@@ -40,13 +43,22 @@ public class UserController {
                     }
             
                     System.out.println("User created successfully!");
-                    
+                    ConsoleUtils.pause();
 
                     break;
                 case 2:
-                // update player
+
                 case 3:
-                // find player
+                    try {
+                        System.out.println("Enter user id: ");
+                        Long id = MyScanner.ScanLong();
+                        User user = findUserUseCase.execute(id);
+                        displayUserDetails(user);
+                    } catch (Exception e) {
+                        System.out.println("Invalid id.");
+                    }
+                    ConsoleUtils.pause();
+                    break;
                 case 6:
                     return;
                 default:
@@ -56,7 +68,7 @@ public class UserController {
         
     }
 
-       public void displayMenu() {
+    public void displayMenu() {
         ConsoleUtils.cleanScreen();
         System.out.println("---------------------PLAYER MENU---------------------------------------");
         System.out.println("1. Create player");
@@ -65,5 +77,11 @@ public class UserController {
         System.out.println("4. Delete player");
         System.out.println("5. List all players");
         System.out.println("6. Go back");
+    }
+
+    public void displayUserDetails(User user){
+        System.out.println("User id: " + user.getId());
+        System.out.println("User name: " + user.getName());
+        System.out.println("User email: " + user.getEmail());
     }
 }
